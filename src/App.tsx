@@ -231,7 +231,7 @@ const App: React.FC = () => {
   const FloatingIcons = () => {
     const icons = ['🍴', '🥄', '🍗', '🥩', '🍕', '🍔', '🥗', '🍲', '🥘', '🍳', '🍎', '🥦', '🥐', '🥨', '🥞'];
     return (
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.07] z-0">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.12] z-0">
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
@@ -599,9 +599,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen p-2 md:p-4 max-w-5xl mx-auto flex flex-col ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen relative">
       <FloatingIcons />
-      <header className={`flex justify-between items-center mb-2 relative z-20 ${isRtl ? 'flex-row-reverse' : ''}`}>
+      <div className={`min-h-screen p-2 md:p-4 max-w-5xl mx-auto flex flex-col relative z-10 ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+        <header className={`flex justify-between items-center mb-2 relative z-20 ${isRtl ? 'flex-row-reverse' : ''}`}>
         <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
           {state.screen !== 'home' && (
             <>
@@ -736,6 +737,7 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

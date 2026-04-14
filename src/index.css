@@ -20,17 +20,17 @@
 }
 
 :root {
-  --bg: #080616;
-  --card: #1A1953;
+  --bg: #0A0A2E; /* Deeper Blue */
+  --card: #16164D;
   --text-primary: #F8FAFC;
   --text-secondary: #CBD5E1;
   --text-on-accent: #FFFFFF;
   --border: #2F2FE4;
   --accent: #2F2FE4;
-  --accent-hover: #162E93;
+  --accent-hover: #4F4FEF;
   --accent-pressed: #1A1953;
-  --btn-bg: #162E93;
-  --btn-hover: #1A1953;
+  --btn-bg: #1A1953;
+  --btn-hover: #2F2FE4;
   --btn-pressed: #080616;
   --home-icon: #FFFFFF;
 }
