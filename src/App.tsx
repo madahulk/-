@@ -32,7 +32,7 @@ const App: React.FC = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false); // Starts on Light Mode (Blue)
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -243,7 +243,7 @@ const App: React.FC = () => {
               ease: "linear",
               delay: i * -5
             }}
-            className="flex gap-24 text-5xl whitespace-nowrap py-10"
+            className="flex gap-24 text-5xl lg:text-7xl whitespace-nowrap py-10"
             style={{ top: `${i * 12}%` }}
           >
             {[...Array(15)].map((_, j) => (
