@@ -32,7 +32,7 @@ const App: React.FC = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -228,69 +228,98 @@ const App: React.FC = () => {
     }));
   };
 
+  const FloatingIcons = () => {
+    const icons = ['🍴', '🥄', '🍗', '🥩', '🍕', '🍔', '🥗', '🍲', '🥘', '🍳', '🍎', '🥦', '🥐', '🥨', '🥞'];
+    return (
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.07] z-0">
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ x: '100%' }}
+            animate={{ x: '-100%' }}
+            transition={{
+              duration: 25 + i * 8,
+              repeat: Infinity,
+              ease: "linear",
+              delay: i * -5
+            }}
+            className="flex gap-24 text-5xl whitespace-nowrap py-10"
+            style={{ top: `${i * 12}%` }}
+          >
+            {[...Array(15)].map((_, j) => (
+              <span key={j} className="inline-block rotate-12">{icons[(i + j) % icons.length]}</span>
+            ))}
+          </motion.div>
+        ))}
+      </div>
+    );
+  };
+
   const renderHome = () => (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-10 relative"
+      className="flex flex-col items-center justify-center min-h-[70vh] text-center space-y-10 relative overflow-hidden"
     >
-      <div className="absolute -z-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-pulse" />
-      
-      {/* 1. Chef Hat (Fades in first) */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ 
-          opacity: 1, 
-          scale: 1,
-          y: [0, -10, 0] 
-        }}
-        transition={{ 
-          opacity: { duration: 0.8, delay: 0 },
-          scale: { duration: 0.8, delay: 0 },
-          y: { repeat: Infinity, duration: 4, ease: "easeInOut" }
-        }}
-        className="relative"
-      >
-        <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full scale-150" />
-        <ChefHat 
-          size={80} 
-          className="text-home-icon relative z-10 drop-shadow-2xl rotate-[-10deg]" 
-        />
-      </motion.div>
-
-      {/* 2. Title (Slides in from the right after hat) */}
-      <div className="relative">
-        <motion.h1
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.8, duration: 1, ease: "easeOut" }}
-          className={`text-5xl md:text-7xl font-black tracking-tighter gradient-text leading-tight ${isRtl ? 'arabic-font' : ''}`}
-        >
-          {state.language === 'en' ? 'Eat Today' : 'هناكل أيه النهارده؟'}
-        </motion.h1>
+      <div className="relative z-10 flex flex-col items-center space-y-10">
+        <div className="absolute -z-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         
-        <motion.div 
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: '40%', opacity: 1 }}
-          transition={{ delay: 1.8, duration: 0.8 }}
-          className="h-2 bg-accent/20 rounded-full mt-4 mx-auto"
-        />
+        {/* 1. Chef Hat (Fades in first) */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: 1, 
+            scale: 1,
+            y: [0, -10, 0] 
+          }}
+          transition={{ 
+            opacity: { duration: 0.8, delay: 0 },
+            scale: { duration: 0.8, delay: 0 },
+            y: { repeat: Infinity, duration: 4, ease: "easeInOut" }
+          }}
+          className="relative"
+        >
+          <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full scale-150" />
+          <ChefHat 
+            size={80} 
+            className="text-home-icon relative z-10 drop-shadow-2xl rotate-[-10deg]" 
+          />
+        </motion.div>
+
+        {/* 2. Title (Slides in from the right after hat) */}
+        <div className="relative">
+          <motion.h1
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8, duration: 1, ease: "easeOut" }}
+            className={`text-5xl md:text-7xl font-black tracking-tighter gradient-text leading-tight ${isRtl ? 'arabic-font' : ''}`}
+          >
+            {state.language === 'en' ? 'Eat Today' : 'هناكل أيه النهارده؟'}
+          </motion.h1>
+          
+          <motion.div 
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: '40%', opacity: 1 }}
+            transition={{ delay: 1.8, duration: 0.8 }}
+            className="h-2 bg-accent/20 rounded-full mt-4 mx-auto"
+          />
+        </div>
+        
+        {/* 3. Button (Appears last) */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.2, duration: 0.5 }}
+          whileHover={{ scale: 1.05, boxShadow: "0 20px 50px rgba(47, 47, 228, 0.4)" }}
+          whileTap={{ scale: 0.95 }}
+          onClick={nextScreen}
+          className={`px-14 py-4 bg-accent hover:opacity-95 text-text-on-accent rounded-3xl text-xl font-black shadow-2xl shadow-accent/30 flex items-center gap-4 transition-all ${isRtl ? 'arabic-font flex-row-reverse' : ''}`}
+        >
+          {t.start}
+          {isRtl ? <ArrowLeft size={28} /> : <ArrowRight size={28} />}
+        </motion.button>
       </div>
-      
-      {/* 3. Button (Appears last) */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.2, duration: 0.5 }}
-        whileHover={{ scale: 1.05, boxShadow: "0 20px 50px rgba(47, 47, 228, 0.4)" }}
-        whileTap={{ scale: 0.95 }}
-        onClick={nextScreen}
-        className={`px-14 py-4 bg-accent hover:opacity-95 text-text-on-accent rounded-3xl text-xl font-black shadow-2xl shadow-accent/30 flex items-center gap-4 transition-all ${isRtl ? 'arabic-font flex-row-reverse' : ''}`}
-      >
-        {t.start}
-        {isRtl ? <ArrowLeft size={28} /> : <ArrowRight size={28} />}
-      </motion.button>
     </motion.div>
   );
 
@@ -571,7 +600,8 @@ const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen p-2 md:p-4 max-w-5xl mx-auto flex flex-col ${isRtl ? 'rtl' : 'ltr'}`} dir={isRtl ? 'rtl' : 'ltr'}>
-      <header className={`flex justify-between items-center mb-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+      <FloatingIcons />
+      <header className={`flex justify-between items-center mb-2 relative z-20 ${isRtl ? 'flex-row-reverse' : ''}`}>
         <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
           {state.screen !== 'home' && (
             <>
@@ -611,22 +641,11 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 relative">
+      <main className="flex-1 relative z-10">
         <AnimatePresence mode="wait">
           {state.screen === 'home' && renderHome()}
           {state.screen === 'selection' && (
-            <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
-              <aside className="geometric-sidebar hidden lg:flex flex-col gap-8">
-                <div className="space-y-2">
-                  <h2 className="text-xl font-bold gradient-text">Meal Selection</h2>
-                  <p className="text-xs text-text-secondary">Choose your preferences to get the best suggestions.</p>
-                </div>
-                <div className="h-px bg-border" />
-                <div className="flex items-center gap-3 text-text-secondary">
-                  <ChefHat size={20} />
-                  <span className="text-sm">Personal Chef AI</span>
-                </div>
-              </aside>
+            <div className="flex flex-col gap-8">
               <div className="flex-1 space-y-2">
                 {renderMealType()}
                 {state.mealType && renderCategory()}
@@ -643,8 +662,8 @@ const App: React.FC = () => {
         </AnimatePresence>
       </main>
 
-      {isLoading && state.screen === 'selection' && (
-        <div className="fixed inset-0 bg-bg/90 backdrop-blur-md z-50 flex flex-col items-center justify-center space-y-8">
+      {isLoading && (
+        <div className="fixed inset-0 bg-bg/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center space-y-8">
           <div className="relative w-32 h-32">
             {/* Plate */}
             <motion.div

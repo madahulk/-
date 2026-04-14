@@ -20,22 +20,6 @@
 }
 
 :root {
-  --bg: #F8FAFC;
-  --card: #FFFFFF;
-  --text-primary: #080616;
-  --text-secondary: #1A1953;
-  --text-on-accent: #FFFFFF;
-  --border: #E2E8F0;
-  --accent: #2F2FE4;
-  --accent-hover: #162E93;
-  --accent-pressed: #1A1953;
-  --btn-bg: #F1F5F9;
-  --btn-hover: #E2E8F0;
-  --btn-pressed: #CBD5E1;
-  --home-icon: #2F2FE4;
-}
-
-.dark {
   --bg: #080616;
   --card: #1A1953;
   --text-primary: #F8FAFC;
@@ -49,6 +33,22 @@
   --btn-hover: #1A1953;
   --btn-pressed: #080616;
   --home-icon: #FFFFFF;
+}
+
+.dark {
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --text-primary: #080616;
+  --text-secondary: #1A1953;
+  --text-on-accent: #FFFFFF;
+  --border: #E2E8F0;
+  --accent: #2F2FE4;
+  --accent-hover: #162E93;
+  --accent-pressed: #1A1953;
+  --btn-bg: #F1F5F9;
+  --btn-hover: #E2E8F0;
+  --btn-pressed: #CBD5E1;
+  --home-icon: #2F2FE4;
 }
 
 @layer base {
