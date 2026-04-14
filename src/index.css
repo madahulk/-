@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-on-accent: var(--text-on-accent);
+  --color-border: var(--border);
+  --color-btn-bg: var(--btn-bg);
+  --color-btn-hover: var(--btn-hover);
+  --color-btn-pressed: var(--btn-pressed);
+  --color-home-icon: var(--home-icon);
+}
+
+:root {
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --text-primary: #080616;
+  --text-secondary: #1A1953;
+  --text-on-accent: #FFFFFF;
+  --border: #E2E8F0;
+  --accent: #2F2FE4;
+  --accent-hover: #162E93;
+  --accent-pressed: #1A1953;
+  --btn-bg: #F1F5F9;
+  --btn-hover: #E2E8F0;
+  --btn-pressed: #CBD5E1;
+  --home-icon: #2F2FE4;
+}
+
+.dark {
+  --bg: #080616;
+  --card: #1A1953;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-on-accent: #FFFFFF;
+  --border: #2F2FE4;
+  --accent: #2F2FE4;
+  --accent-hover: #162E93;
+  --accent-pressed: #1A1953;
+  --btn-bg: #162E93;
+  --btn-hover: #1A1953;
+  --btn-pressed: #080616;
+  --home-icon: #FFFFFF;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-text-primary transition-colors duration-500 font-sans overflow-x-hidden;
+  }
+}
+
+.geometric-card {
+  @apply bg-card border border-border rounded-[16px] shadow-sm;
+}
+
+.geometric-sidebar {
+  @apply bg-card border border-border rounded-[20px] p-4 shadow-sm;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-linear-to-r from-accent to-accent-hover font-bold tracking-tight;
+}
+
+.header-btn {
+  @apply p-1.5 rounded-lg bg-btn-bg border border-border shadow-sm hover:bg-btn-hover active:bg-btn-pressed transition-all duration-200 flex items-center justify-center text-text-secondary hover:text-accent;
+}
+
+.pill {
+  @apply bg-btn-bg border border-border px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all duration-300 hover:bg-btn-hover active:bg-btn-pressed shadow-sm;
+}
+
+.pill-square {
+  @apply aspect-auto flex-row justify-center items-center text-center px-3 py-2 rounded-lg min-w-[80px];
+}
+
+.pill-active {
+  @apply border-accent bg-accent text-text-on-accent font-bold shadow-md shadow-accent/20 scale-[1.01] hover:bg-accent-hover active:bg-accent-pressed;
+}
+
+.compact-section {
+  @apply scale-[0.96] origin-top opacity-60 transition-all duration-500 hover:opacity-100 hover:scale-100;
+}
+
+.tag {
+  @apply inline-flex items-center bg-accent/10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-accent border border-accent/20;
+}
+
+.ingredient-chip {
+  @apply bg-btn-bg border border-border px-3 py-1.5 rounded-[8px] text-xs text-text-secondary;
+}
+
+.arabic-font {
+  font-family: var(--font-arabic);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
