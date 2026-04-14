@@ -31,10 +31,14 @@ export async function generateMeals(
   subFilters: string[],
   count: number = 20
 ): Promise<Meal[]> {
-  const prompt = `Generate ${count} real Egyptian meal recommendations for ${mealType} in the ${category} category. 
-  The user selected these preferences: ${subFilters.join(", ")}.
+  const subFiltersText = subFilters.length > 0 ? subFilters.join(", ") : "Any";
+  const prompt = `Generate exactly ${count} real Egyptian meal recommendations for ${mealType} in the ${category} category. 
+  The user selected these preferences: ${subFiltersText}.
   
-  CRITICAL INSTRUCTIONS FOR RECIPE QUALITY:
+  CRITICAL INSTRUCTIONS:
+  - You MUST return a JSON array of objects.
+  - Do NOT return an empty array.
+  - Each recipe must be authentic Egyptian cuisine.
   - Be EXTREMELY detailed in the cooking method and ingredients.
   - For method: Include specific steps like "bring a tray, put broth and pepper", "soak rice for 5 mins in hot water then 2 mins in cold water", "stir every 10 minutes", etc.
   - For ingredients: List every spice, oil, and specific detail needed.
@@ -54,19 +58,41 @@ export async function generateMeals(
   - healthy: diet-friendly, focus on vegetables and lean protein.`;
 
   try {
+    console.log("Generating meals with prompt:", prompt);
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
         responseSchema: mealSchema,
-        systemInstruction: "You are an expert Egyptian chef. You provide authentic recipes and meal ideas in both English and Arabic.",
+        systemInstruction: "You are an expert Egyptian chef. You provide authentic recipes and meal ideas in both English and Arabic. Return ONLY the JSON array.",
       },
     });
 
     const text = response.text;
-    if (!text) return [];
-    return JSON.parse(text) as Meal[];
+    console.log("Gemini Response Text:", text);
+    
+    if (!text || text.trim() === "" || text === "[]") {
+      console.warn("Gemini returned empty response");
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(text);
+      return Array.isArray(parsed) ? (parsed as Meal[]) : [];
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError, "Text:", text);
+      // Fallback: try to extract JSON if there's markdown
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        try {
+          return JSON.parse(jsonMatch[0]) as Meal[];
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    }
   } catch (error) {
     console.error("Error generating meals:", error);
     return [];
