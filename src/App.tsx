@@ -267,7 +267,7 @@ const App: React.FC = () => {
           transition={{ delay: 0.8, duration: 1, ease: "easeOut" }}
           className={`text-5xl md:text-7xl font-black tracking-tighter gradient-text leading-tight ${isRtl ? 'arabic-font' : ''}`}
         >
-          {state.language === 'en' ? 'What Should We Eat Today?' : 'هناكل أيه النهارده؟'}
+          {state.language === 'en' ? 'Eat Today' : 'هناكل أيه النهارده؟'}
         </motion.h1>
         
         <motion.div 

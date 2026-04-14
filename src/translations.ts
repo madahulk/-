@@ -1,6 +1,6 @@
 export const translations = {
   en: {
-    title: "What should we eat today?",
+    title: "Eat Today",
     start: "Let's Go",
     mealType: "Meal Type",
     mode: "Mode",
