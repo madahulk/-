@@ -31,6 +31,12 @@ export async function generateMeals(
   subFilters: string[],
   count: number = 20
 ): Promise<Meal[]> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error("GEMINI_API_KEY is missing. Please set it in your environment variables.");
+    return [];
+  }
+
   const subFiltersText = subFilters.length > 0 ? subFilters.join(", ") : "Any";
   const prompt = `Generate exactly ${count} real Egyptian meal recommendations for ${mealType} in the ${category} category. 
   The user selected these preferences: ${subFiltersText}.
@@ -60,7 +66,7 @@ export async function generateMeals(
   try {
     console.log("Generating meals with prompt:", prompt);
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
