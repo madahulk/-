@@ -628,9 +628,9 @@ const App: React.FC = () => {
           <button 
             onClick={() => setIsDarkMode(!isDarkMode)}
             className="header-btn"
-            title={isDarkMode ? "Light Mode" : "Dark Mode"}
+            title={isDarkMode ? "Switch to Blue (Light Mode)" : "Switch to White (Dark Mode)"}
           >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
           </button>
           <button 
             onClick={toggleLanguage}
