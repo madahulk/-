@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChefHat, 
@@ -18,6 +18,33 @@ import {
 import { translations } from './translations';
 import { AppState, Language, MealType, Category, Meal } from './types';
 import { generateMeals } from './services/geminiService';
+
+const FloatingIcons = memo(() => {
+  const icons = ['🍴', '🥄', '🍗', '🥩', '🍕', '🍔', '🥗', '🍲', '🥘', '🍳', '🍎', '🥦', '🥐', '🥨', '🥞'];
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.12] z-0">
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ x: '100%' }}
+          animate={{ x: '-100%' }}
+          transition={{
+            duration: 25 + i * 8,
+            repeat: Infinity,
+            ease: "linear",
+            delay: i * -5
+          }}
+          className="flex gap-24 text-5xl lg:text-8xl whitespace-nowrap py-10"
+          style={{ top: `${i * 12}%` }}
+        >
+          {[...Array(15)].map((_, j) => (
+            <span key={j} className="inline-block rotate-12">{icons[(i + j) % icons.length]}</span>
+          ))}
+        </motion.div>
+      ))}
+    </div>
+  );
+});
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
@@ -226,33 +253,6 @@ const App: React.FC = () => {
         ? prev.selectedSubFilters.filter(f => f !== id)
         : [...prev.selectedSubFilters, id]
     }));
-  };
-
-  const FloatingIcons = () => {
-    const icons = ['🍴', '🥄', '🍗', '🥩', '🍕', '🍔', '🥗', '🍲', '🥘', '🍳', '🍎', '🥦', '🥐', '🥨', '🥞'];
-    return (
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.12] z-0">
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ x: '100%' }}
-            animate={{ x: '-100%' }}
-            transition={{
-              duration: 25 + i * 8,
-              repeat: Infinity,
-              ease: "linear",
-              delay: i * -5
-            }}
-            className="flex gap-24 text-5xl lg:text-7xl whitespace-nowrap py-10"
-            style={{ top: `${i * 12}%` }}
-          >
-            {[...Array(15)].map((_, j) => (
-              <span key={j} className="inline-block rotate-12">{icons[(i + j) % icons.length]}</span>
-            ))}
-          </motion.div>
-        ))}
-      </div>
-    );
   };
 
   const renderHome = () => (
