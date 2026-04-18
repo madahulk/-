@@ -1,6 +1,6 @@
 {
-  "name": "Eat Today",
-  "description": "A modern, bilingual food recommendation app that helps you decide what to eat using AI, tailored for Egyptian cuisine.",
+  "name": "Eat Today | هناكل أيه؟",
+  "description": "Smart Egyptian meal generator with deep kitchen knowledge, authentic recipes, and resilient AI integration.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

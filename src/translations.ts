@@ -51,6 +51,10 @@ export const translations = {
     noMeals: "Sorry, I don't have any more meal ideas.",
     noSearchResults: "Not available in the list",
     details: "Meal Details",
+    apiKeyError: "Critical Error: The API Key is invalid. Please check your system settings.",
+    apiKeyMissing: "API Key is missing or a placeholder. Please set it in Settings -> Secrets.",
+    apiKeyFormat: "API Key contains invalid characters. Please check your key.",
+    genError: "Generation failed. Please try again.",
   },
   ar: {
     title: "هناكل أيه النهارده؟",
@@ -104,5 +108,9 @@ export const translations = {
     noMeals: "عذراً، ليس لدي أفكار أكل ثانية.",
     noSearchResults: "ليس متوفر في القائمة",
     details: "تفاصيل الوجبة",
+    apiKeyError: "خطأ حرج: مفتاح الـ API غير صالح. يرجى التأكد من الإعدادات.",
+    apiKeyMissing: "مفتاح الـ API مفقود أو مجرد نص بديل. يرجى ضبطه في الإعدادات -> Secrets.",
+    apiKeyFormat: "مفتاح الـ API يحتوي على أحرف غير صالحة. يرجى التأكد من المفتاح.",
+    genError: "فشل في توليد الوجبات. يرجى المحاولة مرة أخرى.",
   }
 };

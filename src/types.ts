@@ -27,4 +27,5 @@ export interface AppState {
   meals: Meal[];
   currentMealIndex: number;
   selectedMeal: Meal | null;
+  error: string | null;
 }

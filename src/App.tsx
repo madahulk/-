@@ -56,6 +56,7 @@ const App: React.FC = () => {
     meals: [],
     currentMealIndex: 0,
     selectedMeal: null,
+    error: null,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -101,24 +102,44 @@ const App: React.FC = () => {
     if (!mealType || !category) return;
     
     setIsLoading(true);
-    const meals = await generateMeals(
-      mealType,
-      category,
-      state.selectedSubFilters
-    );
-    setState(prev => ({ ...prev, meals, screen: 'results', currentMealIndex: 0 }));
-    setIsLoading(false);
+    try {
+      const meals = await generateMeals(
+        mealType,
+        category,
+        state.selectedSubFilters
+      );
+      setState(prev => ({ ...prev, meals, screen: 'results', currentMealIndex: 0, error: null }));
+    } catch (err: any) {
+      console.error("Generation error:", err);
+      let errorKey = 'genError';
+      if (err.message === 'INVALID_GEMINI_API_KEY') errorKey = 'apiKeyError';
+      if (err.message === 'GEMINI_API_KEY_MISSING') errorKey = 'apiKeyMissing';
+      if (err.message === 'INVALID_API_KEY_FORMAT') errorKey = 'apiKeyFormat';
+      setState(prev => ({ ...prev, error: errorKey }));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAgain = async () => {
     setIsLoading(true);
-    const newMeals = await generateMeals(
-      state.mealType,
-      state.category || 'normal',
-      state.selectedSubFilters
-    );
-    setState(prev => ({ ...prev, meals: [...prev.meals, ...newMeals], currentMealIndex: prev.meals.length }));
-    setIsLoading(false);
+    try {
+      const newMeals = await generateMeals(
+        state.mealType,
+        state.category || 'normal',
+        state.selectedSubFilters
+      );
+      setState(prev => ({ ...prev, meals: [...prev.meals, ...newMeals], currentMealIndex: prev.meals.length, error: null }));
+    } catch (err: any) {
+      console.error("Regeneration error:", err);
+      let errorKey = 'genError';
+      if (err.message === 'INVALID_GEMINI_API_KEY') errorKey = 'apiKeyError';
+      if (err.message === 'GEMINI_API_KEY_MISSING') errorKey = 'apiKeyMissing';
+      if (err.message === 'INVALID_API_KEY_FORMAT') errorKey = 'apiKeyFormat';
+      setState(prev => ({ ...prev, error: errorKey }));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const filteredMeals = useMemo(() => {
@@ -454,7 +475,7 @@ const App: React.FC = () => {
           disabled={state.selectedSubFilters.length === 0 || isLoading}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={handleGenerate}
+          onClick={() => handleGenerate()}
           className={`px-10 py-3 bg-accent text-text-on-accent rounded-full font-bold shadow-lg flex items-center gap-2 disabled:opacity-50 text-sm transition-all ${isRtl ? 'arabic-font flex-row-reverse' : ''}`}
         >
           {isLoading ? <Loader2 className="animate-spin" size={20} /> : t.next}
@@ -481,7 +502,14 @@ const App: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredMeals.length === 0 && !isLoading && (
+        {state.error && (
+          <div className="col-span-full text-center py-12 p-6 bg-red-500/10 rounded-2xl border border-red-500/20">
+            <p className={`text-red-500 font-bold ${isRtl ? 'arabic-font' : ''}`}>
+              {t[state.error as keyof typeof t] || state.error}
+            </p>
+          </div>
+        )}
+        {filteredMeals.length === 0 && !isLoading && !state.error && (
           <div className="col-span-full text-center py-12">
             <p className="text-text-secondary">{searchQuery ? t.noSearchResults : t.noMeals}</p>
           </div>
@@ -516,7 +544,7 @@ const App: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={handleAgain}
+          onClick={() => handleAgain()}
           disabled={isLoading}
           className={`px-8 py-2 border border-accent text-accent rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all hover:bg-accent/5 ${isRtl ? 'arabic-font flex-row-reverse' : ''}`}
         >
