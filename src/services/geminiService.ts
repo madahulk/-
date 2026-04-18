@@ -42,46 +42,78 @@ export async function generateMeals(
   subFilters: string[],
   count: number = 20
 ): Promise<Meal[]> {
-  const models = ["gemini-flash-latest", "gemini-3-flash-preview"];
+  // If running in browser, call the API endpoint
+  if (typeof window !== "undefined") {
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mealType, category, subFilters, count }),
+      });
+      if (!response.ok) throw new Error("Failed to fetch from server");
+      return await response.json();
+    } catch (error) {
+      console.error("Client fetch error:", error);
+      return [];
+    }
+  }
+
+  // Server-side logic (SDK)
+  return generateMealsBackend(mealType, category, subFilters, count);
+}
+
+async function generateMealsBackend(
+  mealType: MealType,
+  category: Category,
+  subFilters: string[],
+  count: number
+): Promise<Meal[]> {
+  // Use recommended models from the Gemini API skill
+  const models = [
+    "gemini-3-flash-preview", 
+    "gemini-3.1-flash-lite-preview",
+    "gemini-2.0-flash", 
+    "gemini-flash-latest"
+  ];
   let lastError: any = null;
 
-  for (const modelName of models) {
+  for (let i = 0; i < models.length; i++) {
+    const modelName = models[i];
     try {
+      // Add a small delay between retries if this isn't the first attempt
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * i));
+      }
+
       const ai = getAi();
       const subFiltersText = subFilters.length > 0 ? subFilters.join(", ") : "Any";
-      const prompt = `Generate exactly ${count} real Egyptian meal recommendations for ${mealType} in the ${category} category. 
-      The user selected these preferences: ${subFiltersText}.
       
-      CRITICAL INSTRUCTIONS:
-      - You MUST return a JSON array of objects.
-      - Do NOT return an empty array.
-      - Each recipe must be authentic Egyptian cuisine.
-      - Be EXTREMELY detailed in the cooking method and ingredients.
-      - For method: Include specific steps like "bring a tray, put broth and pepper", "soak rice for 5 mins in hot water then 2 mins in cold water", "stir every 10 minutes", etc.
-      - For ingredients: List every spice, oil, and specific detail needed.
-      - If the category is 'hot' dessert: Focus on cakes, tarts, and oven-baked sweets.
-      - If the category is 'cold' dessert: Focus on all types of ice cream, flavors, and homemade cold treats.
-      - If 'lunch' is selected and subfilters include 'rice' (أرز) or 'pasta' (مكرونة) or both: You MUST include "Egyptian Koshary" (كشري مصري) as one of the primary recommendations with its full detailed recipe.
-      - If 'lunch' is selected and 'pastries' (معجنات) is selected: Focus on Crepes (كريب), Pizza (بيتزا), and various Pies/Fatair (فطاير).
-      - If 'breakfast' or 'dinner' is selected and 'pastries' (معجنات) is selected: Ensure you include various types of bread such as Baladi Bread (عيش بلدي), Fino Bread (عيش فينو), and Shami Bread (عيش شامي) as individual meal recommendations.
-      
-      Ensure the meals are authentic, with correct ingredients and spices.
-      Avoid repetition and ensure variety.
-      Return the data in the specified JSON format.
-      Category rules:
-      - economic: affordable, simple ingredients.
-      - normal: standard Egyptian home cooking.
-      - medium: balanced portions, slightly lighter.
-      - healthy: diet-friendly, focus on vegetables and lean protein.`;
+      const prompt = `Generate exactly ${count} Egyptian recipes for ${mealType} (${category}).
+Preferences: ${subFiltersText}.
 
-      console.log(`Generating meals with model ${modelName}...`);
+CRITICAL:
+1. Return ONLY a JSON array.
+2. Must be authentic Egyptian.
+3. Very detailed method & ingredients.
+4. If lunch + rice/pasta: MUST include Koshary.
+5. If lunch + pastries: Focus on Crepes/Pizza.
+6. If breakfast/dinner + pastries: Focus on Baladi/Fino/Shami bread.
+
+Category definitions:
+- economic: cheap.
+- normal: standard home.
+- medium: balanced portions.
+- healthy: diet focus.`;
+
+      console.log(`Attempt ${i + 1}: Generating with ${modelName}...`);
+      
       const response = await ai.models.generateContent({
         model: modelName,
         contents: prompt,
         config: {
           responseMimeType: "application/json",
           responseSchema: mealSchema,
-          systemInstruction: "You are an expert Egyptian chef. You provide authentic recipes and meal ideas in both English and Arabic. Return ONLY the JSON array.",
+          systemInstruction: "You are an expert Egyptian chef. Provide authentic recipes in English and Arabic. Return ONLY the JSON array.",
         },
       });
 
@@ -95,10 +127,11 @@ export async function generateMeals(
       try {
         const parsed = JSON.parse(text);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          console.log(`Successfully generated ${parsed.length} meals with ${modelName}`);
           return parsed as Meal[];
         }
       } catch (parseError) {
-        console.error(`JSON Parse Error with ${modelName}:`, text);
+        console.error(`JSON Parse Error with ${modelName}`);
         const jsonMatch = text.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
           try {
@@ -111,21 +144,28 @@ export async function generateMeals(
       }
     } catch (error: any) {
       lastError = error;
-      const errorMsg = error.message || "";
-      if (errorMsg.includes("429") || errorMsg.includes("high demand") || errorMsg.includes("RESOURCE_EXHAUSTED")) {
-        console.warn(`Model ${modelName} is experiencing high demand, trying next model...`);
+      console.warn(`Attempt with ${modelName} failed:`, error?.message || error);
+      
+      // If it's a 429 or 500/503/RPC error, we try the next model
+      // Error code 6 or UNKNOWN status usually indicates a transient RPC issue
+      const errorStr = JSON.stringify(error).toLowerCase();
+      if (
+        errorStr.includes("429") || 
+        errorStr.includes("500") || 
+        errorStr.includes("rpc") ||
+        errorStr.includes("demand") ||
+        errorStr.includes("unavailable")
+      ) {
         continue;
       }
+      
+      // For fatal errors (like 401/403 with wrong key), stop
       break;
     }
   }
 
   if (lastError) {
-    if (lastError.message === "GEMINI_API_KEY_MISSING") {
-      console.error("CRITICAL: GEMINI_API_KEY is missing in the environment.");
-    } else {
-      console.error("Error generating meals after all attempts:", lastError);
-    }
+    console.error("Meal generation failed after all available models:", lastError);
   }
   return [];
 }
